@@ -54,18 +54,6 @@ pub enum BlockType {
     /// Proposal with extensions (e.g. system transactions).
     ProposalExt(ProposalExt),
 
-    /// A virtual block that's constructed by nodes from DAG, this is purely a local thing so
-    /// we hide it from serde
-    #[serde(skip_deserializing)]
-    DAGBlock {
-        author: Author,
-        failed_authors: Vec<(Round, Author)>,
-        validator_txns: Vec<ValidatorTransaction>,
-        payload: Payload,
-        node_digests: Vec<HashValue>,
-        parent_block_id: HashValue,
-        parents_bitvec: BitVec,
-    },
 
     /// Optimistic proposal
     OptProposal {
@@ -80,6 +68,19 @@ pub enum BlockType {
         failed_authors: Vec<(Round, Author)>,
         /// Grandparent QC, used to generate previous_bitvec
         grandparent_qc: QuorumCert,
+    },
+
+    /// A virtual block that's constructed by nodes from DAG, this is purely a local thing so
+    /// we hide it from serde
+    #[serde(skip_deserializing)]
+    DAGBlock {
+        author: Author,
+        failed_authors: Vec<(Round, Author)>,
+        validator_txns: Vec<ValidatorTransaction>,
+        payload: Payload,
+        node_digests: Vec<HashValue>,
+        parent_block_id: HashValue,
+        parents_bitvec: BitVec,
     },
 }
 
