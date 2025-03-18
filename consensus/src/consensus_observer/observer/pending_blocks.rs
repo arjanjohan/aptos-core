@@ -13,7 +13,7 @@ use aptos_config::{config::ConsensusObserverConfig, network_id::PeerNetworkId};
 use aptos_crypto::HashValue;
 use aptos_infallible::Mutex;
 use aptos_logger::{error, info, warn};
-use aptos_types::block_info::Round;
+use aptos_types::{block_info::Round, ledger_info::LedgerInfoWithSignatures};
 use std::{
     collections::{btree_map::Entry, BTreeMap},
     sync::Arc,
@@ -97,6 +97,12 @@ impl PendingBlockStore {
         // Check if the block is already in the store by epoch and round
         self.blocks_without_payloads
             .contains_key(&first_block_epoch_round)
+    }
+
+    #[cfg(test)]
+    /// Returns all pending blocks in the store. This is only used for testing.
+    pub fn get_pending_blocks(&self) -> Vec<Arc<PendingBlockWithMetadata>> {
+        self.blocks_without_payloads.values().cloned().collect()
     }
 
     /// Returns the pending block with the given hash (if it exists)
@@ -193,6 +199,19 @@ impl PendingBlockStore {
                     .remove(&first_block.id());
             }
         }
+    }
+
+    /// Removes the pending blocks for the given commit ledger info. If
+    /// the execution pool window size is None, all blocks up to (and
+    /// including) the epoch and round of the commit will be removed.
+    /// Otherwise, a buffer of blocks preceding the commit will be retained
+    /// (to ensure we have enough blocks to satisfy the execution window).
+    pub fn remove_blocks_for_commit(
+        &mut self,
+        _commit_ledger_info: &LedgerInfoWithSignatures,
+        _execution_pool_window_size: Option<u64>,
+    ) {
+        panic!("COMPLETE ME!");
     }
 
     /// Removes and returns the block from the store that is now ready
